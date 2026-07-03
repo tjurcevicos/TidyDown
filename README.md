@@ -1,6 +1,7 @@
 <p align="center">
-  <img src="src/assets/tidy.png" alt="TidyDown" width="200">
+  <img src="/assets/tidy.png" alt="TidyDown" width="200">
 </p>
+
 
 
 # 🧹 TidyDown™
