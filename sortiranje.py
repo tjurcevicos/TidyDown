@@ -4,16 +4,12 @@ import winreg
 
 def dohvati_univerzalni_downloads_folder():
     try:
-        # Windows pamti lokaciju Downloads foldera pod ovim jedinstvenim kodom (GUID)
         kljuc_putanja = r"Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders"
         guid_za_downloads = "{7D1D3A04-DEBB-4115-95C0-2F35929BEC04}"
-        
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, kljuc_putanja) as kljuc:
             putanja, _ = winreg.QueryValueEx(kljuc, guid_za_downloads)
-            # Expandvars rjesava sistemske kratice poput %USERPROFILE%
             return os.path.expandvars(putanja)
     except Exception:
-        # Ako gornja metoda zakaze, koristi se standardni fallback na engleski
         return os.path.join(os.path.expanduser("~"), "Downloads")
 
 FOLDER_ZA_CISCENJE = dohvati_univerzalni_downloads_folder()
@@ -23,7 +19,7 @@ PRAVILA_SORTIRANJA = {
     "Videos": [".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm", ".vob", ".mpeg", ".3gp"],
     "Archives_and_Zip": [".zip", ".rar", ".7z", ".tar", ".gz", ".iso", ".bz2", ".xz", ".z", ".pkg", ".deb", ".rpm"],
     "PDF_Documents": [".pdf"],
-    "Text_and_Office": [".txt", ".doc", ".docx", ".odt", ".rtf", ".tex", ".wpd", ".xls", ".xlsx", ".ods", ".csv", ".ppt", ".pptx", ".pps", ".odp"],
+    "Text_and_Office": [".txt", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".csv", ".odt", ".rtf"],
     "Images_and_Photos": [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".webp", ".tiff", ".ico", ".psd", ".ai"],
     "Programs_and_Installers": [".exe", ".msi", ".bat", ".cmd", ".sh", ".com", ".jar"],
     "Ebooks": [".epub", ".mobi", ".azw", ".azw3", ".djvu"],
@@ -55,7 +51,8 @@ def sortiraj_folder():
         if os.path.isdir(putanja_datoteke) or datoteka_cisto.lower() == "desktop.ini":
             continue
 
-        ekstenzija = os.path.splitext(datoteka_cisto).lower()
+        # Ovdje je ispravljeno: dodan je [1] na kraj da uzme samo ekstenziju
+        ekstenzija = os.path.splitext(datoteka_cisto)[1].lower()
 
         if ekstenzija in [".crdownload", ".tmp"]:
             continue
@@ -69,7 +66,7 @@ def sortiraj_folder():
 
                 nova_putanja = osiguraj_unikatno_ime(odredisni_folder, datoteka_cisto)
                 shutil.move(putanja_datoteke, nova_putanja)
-                print(f"Moved: {datoteka_cisto} -> {naziv_foldera}")
+                print(f"Moved: {datoteka_cisto} -> {nav_foldera}" if 'nav_foldera' in locals() else f"Moved: {datoteka_cisto} -> {naziv_foldera}")
                 brojac += 1
                 nadjen_folder = True
                 break
